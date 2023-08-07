@@ -15,35 +15,40 @@ function _handleJokeSkill(keywords) {
     window.models_generic.CallCurrentModel();
 }
 
-async function handleTextSkill(event) {
-    debugger
-    if (!event.istranslated) {
-        let response;
-        try {
-            response = await fetch(`https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token=${access_token}`,{
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json;charset=utf-8",
-                },
-                body: JSON.stringify({"q": event.value, "from": "auto", "to": "zh"}),
-            })
-        } catch(e) {
-            console.log(e);
-            return;
-        }
-        const responseText = await response.text();
-        const responseObj = JSON.parse(responseText);
-        if (responseObj.error_code) {
-            console.log(responseObj)
-        } else {
-            const translatedText = responseObj.result.trans_result[0].dst;
-            window.hooks.emit('moemate_core:handle_skill_text', {name: event.name, value: translatedText, istranslated: true});
-        }
+async function translateText(text) {
+    let response;
+    try {
+        response = await fetch(`https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token=${access_token}`,{
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json;charset=utf-8",
+            },
+            body: JSON.stringify({"q": text, "from": "auto", "to": "zh"}),
+        })
+    } catch(e) {
+        console.log(e);
+        return false;
     }
-    // const responseObj = JSON.parse(response);
-    // const name = window.companion.GetCharacterAttribute('name');
-    // const joke = JSON.parse(response).joke.replace(/\\/g, '');
-    // window.hooks.emit('moemate_core:handle_skill_text', {name: name, value: joke});
+    const responseText = await response.text();
+    const responseObj = JSON.parse(responseText);
+    if (responseObj.error_code) {
+        console.log(responseObj)
+        return false;
+    } else {
+        const translatedText = responseObj.result.trans_result[0].dst;
+        return translatedText;
+    }
+}
+
+async function handleTextSkill(event) {
+    let emote = /\*.*\*/.exec(event.value);
+    if (emote) return;
+
+    await window.companion.WaitForTurn(async () => {
+        const translatedText = await translateText(event.value);
+        // await new Promise(resolve => setTimeout(resolve, 3000)); // for testing message order
+        if (translatedText) window.companion.SendMessage({type: "TEXT", user: event.name, value: translatedText});
+    });
 }
 
 export function init() {
