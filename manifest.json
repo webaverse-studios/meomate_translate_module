@@ -1,0 +1,26 @@
+{
+  "name": "translate",
+  "title": "Translate",
+  "description": "Show translated message below original message",
+  "authors": [
+    {
+      "name": "Vis",
+      "email": "gonnavis@gmail.com",
+      "url": "http://gonnavis.com"
+    }
+  ],
+  "version": "1.0",
+  "compatibility": {
+    "minimum": "0.9.3",
+    "verified": "0.9.3"
+  },
+  "models": [
+    "models/translate_api.json.hbs"
+  ],
+  "skills": [
+    "skills/translate.json.hbs"
+  ],
+  "scripts": [
+    "scripts/translate.js"
+  ]
+}
