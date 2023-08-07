@@ -14,12 +14,6 @@
     "minimum": "0.9.3",
     "verified": "0.9.3"
   },
-  "models": [
-    "models/translate_api.json.hbs"
-  ],
-  "skills": [
-    "skills/translate.json.hbs"
-  ],
   "scripts": [
     "scripts/translate.js"
   ]

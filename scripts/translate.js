@@ -5,16 +5,6 @@
 
 const access_token = ''; // https://ai.baidu.com/ai-doc/MT/4kqryjku9
 
-function _handleJokeSkill(keywords) {
-    const context = {
-        humorApiFunction:'jokes/random',
-        humorApiQueryString: `exclude-tags=nsfw,dark,racist,jewish,sexual&include-tags=${keywords.value}`
-    }
-    window.models_generic.SetCurrentModel('comedian:humorapi')
-    window.models_generic.ApplyContextObject(context);
-    window.models_generic.CallCurrentModel();
-}
-
 async function translateText(text) {
     let response;
     try {
