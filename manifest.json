@@ -15,7 +15,8 @@
     "verified": "0.9.3"
   },
   "models": [
-    "models/translate_api.json.hbs"
+    "models/translate_api.json.hbs",
+    "models/voice_api.json.hbs"
   ],
   "scripts": [
     "scripts/translate.js"

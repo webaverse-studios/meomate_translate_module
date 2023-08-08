@@ -18,6 +18,20 @@ async function translateText(text) {
     return translatedText;
 }
 
+async function speakText(text) {
+    const context = {
+        access_token,
+        text,
+    }
+    const model = window.models.CreateModel('translate:voiceapi')
+    window.models.ApplyContextObject(model, context);
+    // // debugger
+    const stream_uuid = await window.models.CallModel(model, {name: 'Spark', value: text}, {stream: true, abortable: true, timeout: 20000});
+    // // debugger
+    await window.companion.SendVoiceStream(stream_uuid);
+    window.models.DestroyModel(model);
+}
+
 async function handleTextSkill(event) {
     let emote = /\*.*\*/.exec(event.value);
     if (emote) return;
@@ -26,7 +40,10 @@ async function handleTextSkill(event) {
         // await new Promise(resolve => setTimeout(resolve, 3000)); // for testing message order
         const translatedText = await translateText(event.value);
         const name = window.companion.GetCharacterAttribute('name');
-        if (translatedText) window.companion.SendMessage({type: "TEXT", user: name, value: translatedText});
+        if (translatedText) {
+            window.companion.SendMessage({type: "TEXT", user: name, value: translatedText});
+            await speakText(translatedText);
+        }
     });
 }
 
