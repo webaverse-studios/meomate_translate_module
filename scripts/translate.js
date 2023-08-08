@@ -22,12 +22,13 @@ async function speakText(text) {
     const context = {
         access_token,
         text,
+        hightQuality: false,
+        // hightQuality: false: QPS 10, and I have totally 50000 calls.
+        // hightQuality: true:  QPS 2,  and I have totally 2000  calls only, maybe fail when you trying, and please use sparingly🙏.
     }
     const model = window.models.CreateModel('translate:voiceapi')
     window.models.ApplyContextObject(model, context);
-    // // debugger
     const stream_uuid = await window.models.CallModel(model, {name: 'Spark', value: text}, {stream: true, abortable: true, timeout: 20000});
-    // // debugger
     await window.companion.SendVoiceStream(stream_uuid);
     window.models.DestroyModel(model);
 }

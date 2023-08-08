@@ -1,7 +1,7 @@
 {
     "name": "translate:voiceapi",
     "type": "generic",
-    "url": "https://tsn.baidu.com/text2audio?tex={{text}}&lan=zh&cuid=123&ctp=1&tok={{access_token}}",
+    "url": "https://tsn.baidu.com/text2audio?tex={{text}}&lan=zh&cuid=123&ctp=1&tok={{access_token}}{{#if hightQuality}}&per=5118{{/if}}",
     "method": "GET",
     "headers": {
     }
