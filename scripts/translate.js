@@ -30,6 +30,19 @@ async function translateText(text) {
     }
 }
 
+async function speakText(text) {
+    let response;
+    try {
+        response = await fetch(`https://tsn.baidu.com/text2audio?tex=${text}&lan=zh&cuid=123&ctp=1&tok=${access_token}`)
+    } catch(e) {
+        // debugger
+        console.log(e);
+        return false;
+    }
+    // debugger
+    await window.companion.SendVoiceStream(response.body);
+}
+
 async function handleTextSkill(event) {
     let emote = /\*.*\*/.exec(event.value);
     if (emote) return;
@@ -38,6 +51,7 @@ async function handleTextSkill(event) {
         const translatedText = await translateText(event.value);
         // await new Promise(resolve => setTimeout(resolve, 3000)); // for testing message order
         if (translatedText) window.companion.SendMessage({type: "TEXT", user: event.name, value: translatedText});
+        await speakText(translatedText);
     });
 }
 
