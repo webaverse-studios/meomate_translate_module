@@ -6,41 +6,14 @@
 const access_token = ''; // https://ai.baidu.com/ai-doc/MT/4kqryjku9
 
 async function translateText(text) {
-    let response;
-    try {
-        response = await fetch(`https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token=${access_token}`,{
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json;charset=utf-8",
-            },
-            body: JSON.stringify({"q": text, "from": "auto", "to": "zh"}),
-        })
-    } catch(e) {
-        console.log(e);
-        return false;
+    const context = {
+        access_token,
+        payload: JSON.stringify({"q": text, "from": "auto", "to": "zh"}),
     }
-    const responseText = await response.text();
-    const responseObj = JSON.parse(responseText);
-    if (responseObj.error_code) {
-        console.log(responseObj)
-        return false;
-    } else {
-        const translatedText = responseObj.result.trans_result[0].dst;
-        return translatedText;
-    }
-}
-
-async function speakText(text) {
-    let response;
-    try {
-        response = await fetch(`https://tsn.baidu.com/text2audio?tex=${text}&lan=zh&cuid=123&ctp=1&tok=${access_token}`)
-    } catch(e) {
-        // debugger
-        console.log(e);
-        return false;
-    }
-    // debugger
-    await window.companion.SendVoiceStream(response.body);
+    const model = window.models.CreateModel('translate:translateapi')
+    window.models.ApplyContextObject(model, context);
+    await window.models.CallModel(model);
+    window.models.DestroyModel(model);
 }
 
 async function handleTextSkill(event) {
@@ -48,13 +21,18 @@ async function handleTextSkill(event) {
     if (emote) return;
 
     await window.companion.WaitForTurn(async () => {
-        const translatedText = await translateText(event.value);
         // await new Promise(resolve => setTimeout(resolve, 3000)); // for testing message order
-        if (translatedText) window.companion.SendMessage({type: "TEXT", user: event.name, value: translatedText});
-        await speakText(translatedText);
+        await translateText(event.value);
     });
+}
+
+async function _handleApiResponse(response) {
+    const translatedText = response.response.result.trans_result[0].dst;
+    const name = window.companion.GetCharacterAttribute('name');
+    if (translatedText) window.companion.SendMessage({type: "TEXT", user: name, value: translatedText});
 }
 
 export function init() {
     window.hooks.on("moemate_core:handle_skill_text", (event) => handleTextSkill(event));
+    window.hooks.on('models:response:translate:translateapi', _handleApiResponse);
 }
