@@ -28,7 +28,7 @@ async function speakText(text) {
     }
     const model = window.models.CreateModel('translate:voiceapi')
     window.models.ApplyContextObject(model, context);
-    const stream_uuid = await window.models.CallModel(model, {name: 'Spark', value: text}, {stream: true, abortable: true, timeout: 20000});
+    const stream_uuid = await window.models.CallModel(model, undefined, {stream: true, abortable: true, timeout: 20000});
     await window.companion.SendVoiceStream(stream_uuid);
     window.models.DestroyModel(model);
 }
