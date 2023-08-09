@@ -3,12 +3,14 @@
  * Show translated message below original message
  */
 
-const access_token = ''; // https://ai.baidu.com/ai-doc/MT/4kqryjku9
+const access_token = ''; // https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu
+
+const dstLanguage = 'zh'; // https://ai.baidu.com/ai-doc/MT/4kqryjku9 Support 200+ languages, such as 'de', 'jp'
 
 async function translateText(text) {
     const context = {
         access_token,
-        payload: JSON.stringify({"q": text, "from": "auto", "to": "zh"}),
+        payload: JSON.stringify({"q": text, "from": "auto", "to": dstLanguage}),
     }
     const model = window.models.CreateModel('translate:translateapi')
     window.models.ApplyContextObject(model, context);
@@ -43,7 +45,7 @@ async function handleTextSkill(event) {
         const name = window.companion.GetCharacterAttribute('name');
         if (translatedText) {
             window.companion.SendMessage({type: "TEXT", user: name, value: translatedText});
-            await speakText(translatedText);
+            if (dstLanguage === 'zh') await speakText(translatedText); // https://ai.baidu.com/ai-doc/SPEECH/mlbxh7xie Voice currently only support Chinese and English mixed mode
         }
     });
 }
