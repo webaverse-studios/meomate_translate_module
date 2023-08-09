@@ -15,7 +15,7 @@ async function translateText(text) {
     const model = window.models.CreateModel('translate:translateapi')
     window.models.ApplyContextObject(model, context);
     const response = await window.models.CallModel(model);
-    const translatedText = response.result.trans_result[0].dst;
+    const translatedText = response?.result?.trans_result[0]?.dst;
     window.models.DestroyModel(model);
     return translatedText;
 }
@@ -42,7 +42,8 @@ async function handleTextSkill(event) {
     await window.companion.WaitForTurn(async () => {
         // await new Promise(resolve => setTimeout(resolve, 3000)); // for testing message order
         const translatedText = await translateText(event.value);
-        const name = window.companion.GetCharacterAttribute('name');
+        // const name = window.companion.GetCharacterAttribute('name');
+        const name = event.name;
         if (translatedText) {
             window.companion.SendMessage({type: "TEXT", user: name, value: translatedText});
             if (dstLanguage === 'zh') await speakText(translatedText); // https://ai.baidu.com/ai-doc/SPEECH/mlbxh7xie Voice currently only support Chinese and English mixed mode
